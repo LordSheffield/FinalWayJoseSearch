@@ -244,5 +244,62 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
                 cout << "Unexpected input." << endl;
             }
         }
+        else if (command == "move") {
+            int selectedShape = 0;
+            string direction = " ";
+            cout << endl << "Type the number of the piece you want to move: ";
+            cin >> selectedShape;
+            cout << endl;
+            for (int i = 0; i < setShapes.size(); ++i) {
+                if (setShapes[i].getWritten() == selectedShape) {
+                    cout << "Enter direction to move in: ";
+                    cin >> direction;
+                    cout << endl;
+                    if (direction == "N") {
+                        if (setShapes[i].collisionNorth(setMatrix) == true) {
+                            cout << "You can move north." << endl;
+                            setShapes[i].moveNorth(setMatrix);
+                            displayMatrix(setMatrix);
+                        }
+                        else {
+                            cout << "Way is blocked" << endl;
+                        }
+                    }
+                    else if (direction == "E") {
+                        if (setShapes[i].collisionEast(setMatrix) == true) {
+                            cout << "You can move east." << endl;
+                            setShapes[i].moveEast(setMatrix);
+                            displayMatrix(setMatrix);
+                        }
+                        else {
+                            cout << "Way is blocked" << endl;
+                        }
+                    }
+                    else if (direction == "S") {
+                        if (setShapes[i].collisionSouth(setMatrix) == true) {
+                            cout << "You can move south." << endl;
+                            setShapes[i].moveSouth(setMatrix);
+                            displayMatrix(setMatrix);
+                        }
+                        else {
+                            cout << "Way is blocked" << endl;
+                        }
+                    }
+                    else if (direction == "W") {
+                        if (setShapes[i].collisionWest(setMatrix) == true) {
+                            cout << "You can move west." << endl;
+                            displayMatrix(setMatrix);
+                        }
+                        else {
+                            cout << "Way is blocked" << endl;
+                        }
+                    }
+                    else {
+                        cout << "Unexpected input." << endl;
+                    }
+                    break;
+                }
+            }
+        }
     }
 }

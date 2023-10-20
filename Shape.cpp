@@ -70,11 +70,11 @@ Shape::Shape(int id, int rR, int rC, bool dummy2) {
 
 
 //Collisions Functions
-bool Shape::collisionNorth(Point root, int type, int(&matrix)[5][9]) {
-    if(matrix[(root.R)-1][root.C] != 0) {
+bool Shape::collisionNorth(int(&matrix)[5][9]) {
+    if(matrix[(root.R)-1][root.C] != 0 || (root.R-1) < 0) {
         return false;
     }
-    else if(matrix[root.R][(root.C)+1] == type) {
+    else if(matrix[root.R][(root.C)+1] == written) {
         if(matrix[(root.R)-1][(root.C)+1] != 0) {
             return false;
         }
@@ -83,11 +83,11 @@ bool Shape::collisionNorth(Point root, int type, int(&matrix)[5][9]) {
         return true;
     }   
 }
-bool Shape::collisionEast(Point end, int type, int(&matrix)[5][9]) {
-    if(matrix[end.R][(end.C)+1] != 0) {
+bool Shape::collisionEast(int(&matrix)[5][9]) {
+    if(matrix[end.R][(end.C)+1] != 0 || (end.C+1) > 9) {
         return false;
     }
-    else if(matrix[(end.R)-1][(end.C)-1] == type) {
+    else if(matrix[(end.R)-1][(end.C)-1] == written) {
         if(matrix[(end.R)-1][end.C] != 0) {
             return false;
         }
@@ -96,21 +96,21 @@ bool Shape::collisionEast(Point end, int type, int(&matrix)[5][9]) {
         return true;
     }
 }
-bool Shape::collisionSouth(Point end, int type, int(&matrix)[5][9]) {
-    if(matrix[(end.R)+1][end.C] != 0) {
+bool Shape::collisionSouth(int(&matrix)[5][9]) {
+    if(matrix[(end.R)+1][end.C] != 0 || (end.R+1) > 5) {
         return false;
     }
-    else if((matrix[end.R][(end.C)-1] == type) && (matrix[end.R][(end.C)-2] == type) && (matrix[end.R][(end.C)-3] == type)) {
+    else if((matrix[end.R][(end.C)-1] == written) && (matrix[end.R][(end.C)-2] == written) && (matrix[end.R][(end.C)-3] == written)) {
         if((matrix[(end.R)+1][(end.C)-1] != 0) || (matrix[(end.R)+1][(end.C)-2] != 0) || (matrix[(end.R)+1][(end.C)-3] != 0)) {
             return false;
         }
     }
-    else if((matrix[end.R][(end.C)-1] == type) && (matrix[end.R][(end.C)-2] != type)) {
+    else if((matrix[end.R][(end.C)-1] == written) && (matrix[end.R][(end.C)-2] != written)) {
         if(matrix[(end.R)+1][(end.C)-1] != 0) {
             return false;
         }
     }
-    else if((matrix[end.R][(end.C)-1] == type) && (matrix[end.R][(end.C)-2] != type) && (matrix[(end.R)-1][(end.C)-2] == type)) {
+    else if((matrix[end.R][(end.C)-1] == written) && (matrix[end.R][(end.C)-2] != written) && (matrix[(end.R)-1][(end.C)-2] == written)) {
         if((matrix[(end.R)+1][(end.C)-1] != 0) && (matrix[end.R][(end.C)-2] != 0)) {
             return false;
         }
@@ -119,11 +119,11 @@ bool Shape::collisionSouth(Point end, int type, int(&matrix)[5][9]) {
         return true;
     }
 }
-bool Shape::collisionWest(Point root, int type, int(&matrix)[5][9]) {
-    if(matrix[root.R][(root.C)-1] != 0) {
+bool Shape::collisionWest(int(&matrix)[5][9]) {
+    if(matrix[root.R][(root.C)-1] != 0 || (root.C-1) < 0) {
         return false;
     }
-    else if(matrix[(root.R)+1][(root.C)+1] == type) {
+    else if(matrix[(root.R)+1][(root.C)+1] == written) {
         if(matrix[(root.R)+1][root.C] != 0) {
             return false;
         }
@@ -134,6 +134,32 @@ bool Shape::collisionWest(Point root, int type, int(&matrix)[5][9]) {
 }
 
 //Move Functions
+void Shape::moveNorth(int(&matrix)[5][9]) {
+    if (id != 6) {
+        for (int i = root.C; i < (end.C+1); ++i) {
+            matrix[i][root.R] = 0;
+            matrix[i][root.R-1] = written;
+        } 
+    }
+}
+
+void Shape::moveEast(int(&matrix)[5][9]) {
+    if (id != 6) {
+        for (int i = root.C; i < (end.C+1); ++i) {
+            matrix[i][root.R] = 0;
+            matrix[i+1][root.R] = written;
+        }
+    }
+}
+
+void Shape::moveSouth(int(&matrix)[5][9]) {
+    if (id != 6) {
+        for (int i = root.C; i < (end.C+1); ++i) {
+            matrix[i][root.R] = 0;
+            matrix[i][root.R+1] = written;
+        } 
+    }
+}
 
 
 /*
