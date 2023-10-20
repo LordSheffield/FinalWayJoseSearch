@@ -35,20 +35,20 @@ public:
 	//Constructor for creating weirds
 	Shape(int id, int rR, int rC, bool dummy2);
 
-	bool collisionNorth(Point root, int type, int(&matrix)[5][9]);
-	bool collisionEast(Point end, int type, int(&matrix)[5][9]);
-	bool collisionSouth(Point end, int type, int(&matrix)[5][9]);
-	bool collisionWest(Point root, int type, int(&matrix)[5][9]);
+	bool collisionNorth(int(&matrix)[5][9]);
+	bool collisionEast(int(&matrix)[5][9]);
+	bool collisionSouth(int(&matrix)[5][9]);
+	bool collisionWest(int(&matrix)[5][9]);
 
 	void displayPoints() {
 		cout << "Root(R,C): (" << root.R << "," << root.C << ")" << endl;
 		cout << "End(R,C): (" << end.R << "," << end.C << ")" << endl;
 	}
 
-	Shape moveN(Shape obj, int(&matrix)[5][9]);
-	Shape moveS(Shape obj, int(&matrix)[5][9]);
-	Shape moveW(Shape obj, int(&matrix)[5][9]);
-	Shape moveE(Shape obj, int(&matrix)[5][9]);
+	void moveNorth(int(&matrix)[5][9]);
+	void moveSouth(int(&matrix)[5][9]);
+	void moveWest(int(&matrix)[5][9]);
+	void moveEast(int(&matrix)[5][9]);
 
 	bool insert(int(&matrix)[5][9]);
 	bool insertWeird(int(&matrix)[5][9]);
