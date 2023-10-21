@@ -65,5 +65,4 @@ public:
 	string getSpriteType() {
 		return spriteType;
 	}
-
 };

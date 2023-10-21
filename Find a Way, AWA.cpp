@@ -172,6 +172,8 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
     string line;
     string command;
     string arg1, arg2, arg3;
+    int int1;
+    Shape* selectedShape = nullptr;
     Tokenizer tkn;
 
     /*///////////////////////////////
@@ -200,6 +202,14 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
             cout << "Exiting ...." << endl;
             return false;
         }
+        if (command == "clear") {
+            system("cls");
+        }
+        if (command == "set") {
+            setDomain(setMatrix, setShapes);
+            displayMatrix(setMatrix);
+        }
+
         if (command == "s") {
             tkn.readWord(arg1);
             if (arg1 == "random") {
@@ -244,62 +254,61 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
                 cout << "Unexpected input." << endl;
             }
         }
-        else if (command == "move") {
-            int selectedShape = 0;
-            string direction = " ";
-            cout << endl << "Type the number of the piece you want to move: ";
-            cin >> selectedShape;
-            cout << endl;
-            for (int i = 0; i < setShapes.size(); ++i) {
-                if (setShapes[i].getWritten() == selectedShape) {
-                    cout << "Enter direction to move in: ";
-                    cin >> direction;
-                    cout << endl;
-                    if (direction == "N") {
-                        if (setShapes[i].collisionNorth(setMatrix) == true) {
-                            cout << "You can move north." << endl;
-                            setShapes[i].moveNorth(setMatrix);
-                            displayMatrix(setMatrix);
-                        }
-                        else {
-                            cout << "Way is blocked" << endl;
-                        }
-                    }
-                    else if (direction == "E") {
-                        if (setShapes[i].collisionEast(setMatrix) == true) {
-                            cout << "You can move east." << endl;
-                            setShapes[i].moveEast(setMatrix);
-                            displayMatrix(setMatrix);
-                        }
-                        else {
-                            cout << "Way is blocked" << endl;
-                        }
-                    }
-                    else if (direction == "S") {
-                        if (setShapes[i].collisionSouth(setMatrix) == true) {
-                            cout << "You can move south." << endl;
-                            setShapes[i].moveSouth(setMatrix);
-                            displayMatrix(setMatrix);
-                        }
-                        else {
-                            cout << "Way is blocked" << endl;
-                        }
-                    }
-                    else if (direction == "W") {
-                        if (setShapes[i].collisionWest(setMatrix) == true) {
-                            cout << "You can move west." << endl;
-                            displayMatrix(setMatrix);
-                        }
-                        else {
-                            cout << "Way is blocked" << endl;
-                        }
-                    }
-                    else {
-                        cout << "Unexpected input." << endl;
-                    }
-                    break;
+        else if (command == "move") { //move 23 N
+            tkn.readInteger(int1);
+            tkn.readWord(arg2);
+
+            for (int i = 0; i < setShapes.size(); i++) {
+                if (setShapes[i].getWritten() == int1) {
+                    selectedShape = &setShapes[i];
                 }
             }
+
+            if (arg2 == "s" || arg2 == "S"){
+                if (selectedShape->collisionSouth(setMatrix)) {
+                    cout << "You can move South." << endl;
+                    selectedShape->moveSouth(setMatrix);
+                    displayMatrix(setMatrix);
+                }
+                else {
+                    cout << "You cannot move South." << endl;
+                }
+            }
+            else if (arg2 == "n" || arg2 == "N") {
+                if (selectedShape->collisionNorth(setMatrix)) {
+                    cout << "You can move North." << endl;
+                    selectedShape->moveNorth(setMatrix);
+                    displayMatrix(setMatrix);
+                }
+                else {
+                    cout << "You cannot move North." << endl;
+                }
+            }
+            else if (arg2 == "e" || arg2 == "E") {
+                if (selectedShape->collisionEast(setMatrix)) {
+                    cout << "You can move East." << endl;
+                    selectedShape->moveEast(setMatrix);
+                    displayMatrix(setMatrix);
+                }
+                else {
+                    cout << "You cannot move East." << endl;
+                }
+            }
+            else if (arg2 == "w" || arg2 == "W") {
+                if (selectedShape->collisionWest(setMatrix)) {
+                    cout << "You can move West." << endl;
+                    selectedShape->moveWest(setMatrix);
+                    displayMatrix(setMatrix);
+                }
+                else {
+                    cout << "You cannot move West." << endl;
+                }
+            }
+            else {
+                cout << "Unexpected input." << endl;
+            }
+
+            continue;
         }
     }
 }

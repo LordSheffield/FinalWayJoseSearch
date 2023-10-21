@@ -1,7 +1,7 @@
 #include "Shape.h"
 #include <vector>
 
-int Shape::instanceCounter = 0; 
+int Shape::instanceCounter = 20; 
 
 //Just creates a null constructor
 Shape::Shape() {
@@ -23,7 +23,7 @@ Shape::Shape(int id, int rR, int cR) {
     end.C = cR;
     this->id = id;
     this->spriteType = "barrier";
-    instanceCounter++;
+    written = 3;
 }
 
 
@@ -54,7 +54,7 @@ Shape::Shape(int id, int rR, int cR, int dummy1) {
         spriteType = "camel";
     }
 
-    instanceCounter++;
+    written = ++instanceCounter;
 }
 
 //Creates weird shapes
@@ -66,6 +66,8 @@ Shape::Shape(int id, int rR, int rC, bool dummy2) {
     this->id = id; //Use id instead of type
     spriteType = "weird";
     instanceCounter++;
+
+    written = ++instanceCounter;
 }
 
 
@@ -119,12 +121,13 @@ bool Shape::collisionSouth(int(&matrix)[5][9]) {
         return true;
     }
 }
+
 bool Shape::collisionWest(int(&matrix)[5][9]) {
-    if(matrix[root.R][(root.C)-1] != 0 || (root.C-1) < 0) {
+    if (matrix[root.R][(root.C) - 1] != 0 || (root.C - 1) < 0) {
         return false;
     }
-    else if(matrix[(root.R)+1][(root.C)+1] == written) {
-        if(matrix[(root.R)+1][root.C] != 0) {
+    else if (matrix[(root.R) + 1][(root.C) + 1] == written) {
+        if (matrix[(root.R) + 1][root.C] != 0) {
             return false;
         }
     }
@@ -134,32 +137,67 @@ bool Shape::collisionWest(int(&matrix)[5][9]) {
 }
 
 //Move Functions
+void Shape::moveWest(int(&matrix)[5][9]) {
+    if (id != 6) {
+        //Loop rows from root.R to end.R (inclusive)
+        for (int i = root.R; i < end.R + 1; i++) {
+            //Clear the index on the right of the shape
+            matrix[i][end.C] = 0;
+            //Move the shape one position to the left
+            matrix[i][root.C - 1] = written;
+        }
+        //Update the root and end column positions
+        root.C -= 1;
+        end.C -= 1;
+    }
+}
+
 void Shape::moveNorth(int(&matrix)[5][9]) {
     if (id != 6) {
-        for (int i = root.C; i < (end.C+1); ++i) {
-            matrix[i][root.R] = 0;
-            matrix[i][root.R-1] = written;
-        } 
+        //Loop columns from root.C to end.C (inclusive)
+        for (int i = root.C; i < end.C + 1; i++) {
+            //Clear the index below the shape
+            matrix[end.R][i] = 0;
+            //Move the shape one position upward
+            matrix[root.R - 1][i] = written;
+        }
+        //Update the root and end row positions
+        root.R -= 1;
+        end.R -= 1;
     }
 }
 
 void Shape::moveEast(int(&matrix)[5][9]) {
     if (id != 6) {
-        for (int i = root.C; i < (end.C+1); ++i) {
-            matrix[i][root.R] = 0;
-            matrix[i+1][root.R] = written;
+        //Loop rows from root.R to end.R (inclusive)
+        for (int i = root.R; i < end.R + 1; i++) {
+            //Clear the index on the left of the shape
+            matrix[i][root.C] = 0;
+            //Move the shape one position to the right
+            matrix[i][end.C + 1] = written;
         }
+        //Update the root and end column positions
+        root.C += 1;
+        end.C += 1;
     }
 }
 
 void Shape::moveSouth(int(&matrix)[5][9]) {
     if (id != 6) {
-        for (int i = root.C; i < (end.C+1); ++i) {
-            matrix[i][root.R] = 0;
-            matrix[i][root.R+1] = written;
-        } 
+        //Loop columns from root.C to end.C (inclusive)
+        for (int i = root.C; i < end.C + 1; i++) {
+            //Clear the inxed above the shape
+            matrix[root.R][i] = 0;
+            //Move the shape one position downward
+            matrix[end.R + 1][i] = written;
+        }
+        //Update the root and end row positions
+        root.R += 1;
+        end.R += 1;
     }
 }
+
+
 
 
 /*
@@ -181,10 +219,8 @@ bool Shape::insert(int(&matrix)[5][9]) {
         if (matrix[this->root.R][j] != 0) { 
             return false;
         }
-        matrix[this->root.R][j] = id * 10 + instanceCounter;
+        matrix[this->root.R][j] = written;
     }
-
-    this->written = id * 10 + instanceCounter; //Assign unique value to member "written"
 
     return true;
 }
@@ -200,17 +236,16 @@ bool Shape::insertWeird(int(&matrix)[5][9]) {
         if (matrix[this->root.R][j] != 0) {
             return false;
         }
-        matrix[this->root.R][j] = id * 10 + instanceCounter; //This is the same as the other 3 instances of this 'this->id * 10 + instanceCounter'. 3 times because of the 'return false' at different points
+        matrix[this->root.R][j] = written;
     }
 
     for (int j = this->root.C + 1; j <= this->end.C; ++j) { //row 1 from column n+1 to n+2
         if (matrix[this->root.R + 1][j] != 0) {
             return false;
         }
-        matrix[this->root.R + 1][j] = id * 10 + instanceCounter; //See last comment on the same code above
+        matrix[this->root.R + 1][j] = written;
     }
 
-    this->written = id * 10 + instanceCounter; //See comment on the same code above
 
     return true;
 }
@@ -225,8 +260,6 @@ bool Shape::insertBarrier(int(&matrix)[5][9]) {
     if (matrix[this->root.R][this->root.C] != 0) {
         return false;
     }
-
-    this->written = id * 10 + instanceCounter; //Assign unique value to member "written"
 
     matrix[this->root.R][this->root.C] = written; //Writes to matrix
 
