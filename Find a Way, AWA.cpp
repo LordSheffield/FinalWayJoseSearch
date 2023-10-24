@@ -310,5 +310,23 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
 
             continue;
         }
+        else if(command == "convert") {
+            int flattenedMatrix = convert2DTo1D(setMatrix);
+            for (int i = 0; i < flattenedMatrix.length(); i++) {
+                cout << flattenedMatrix[i] << ", ";
+            }
+        }
     }
+}
+
+int convert2DTo1D(int(&matrix)[5][9]) {
+    int result[45];
+    int x = 0;
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 9; j++) {
+            result[x] = matrix[i][j];
+            x += 1;
+        }
+    }
+    return *result;
 }
