@@ -15,9 +15,9 @@ void randomDomain(int(&randomMatrix)[5][9], vector<Shape>& randomShapes);
 void displayMatrix(int(&matrix)[5][9]);
 bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5][9], vector<Shape>& setShapes, int(&setMatrix)[5][9], bool interactive = true);
 
-
-int heuristic(vector<Shape>& shapes);
+//FunctionsThatMightNotWork
 int convert2DTo1D(int(&matrix)[5][9]);
+int heuristic(vector<Shape>& shapes);
 
 int main() {
 
@@ -322,12 +322,12 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
         /*
         else if(command == "convert") {
             int flattenedMatrix = convert2DTo1D(setMatrix);
-            for (int i = 0; i < flattenedMatrix.length(); i++) {
+            for (int i = 0; i < flattenedMatrix.size(); i++) {
                 cout << flattenedMatrix[i] << ", ";
             }
         }
         */
-       else if(command == "h") {
+        else if(command == "h") {
             cout << heuristic(setShapes) << endl;
         }
     }
