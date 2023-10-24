@@ -15,6 +15,10 @@ void randomDomain(int(&randomMatrix)[5][9], vector<Shape>& randomShapes);
 void displayMatrix(int(&matrix)[5][9]);
 bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5][9], vector<Shape>& setShapes, int(&setMatrix)[5][9], bool interactive = true);
 
+
+int heuristic(vector<Shape>& shapes);
+int convert2DTo1D(int(&matrix)[5][9]);
+
 int main() {
 
     srand(time(0)); //Seeds srand
@@ -45,7 +49,7 @@ int main() {
 void displayMatrix(int(&matrix)[5][9]) {
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 9; j++) {
-            cout << matrix[i][j] << " ";
+            cout << matrix[i][j] << " \t";
         }
         cout << endl;
     }
@@ -258,6 +262,11 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
             tkn.readInteger(int1);
             tkn.readWord(arg2);
 
+            if (int1 == 3) {
+                cout << "Error, you attempted to move a barrier." << endl;
+                continue;
+            }
+
             for (int i = 0; i < setShapes.size(); i++) {
                 if (setShapes[i].getWritten() == int1) {
                     selectedShape = &setShapes[i];
@@ -310,11 +319,16 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
 
             continue;
         }
+        /*
         else if(command == "convert") {
             int flattenedMatrix = convert2DTo1D(setMatrix);
             for (int i = 0; i < flattenedMatrix.length(); i++) {
                 cout << flattenedMatrix[i] << ", ";
             }
+        }
+        */
+       else if(command == "h") {
+            cout << heuristic(setShapes) << endl;
         }
     }
 }
@@ -329,4 +343,24 @@ int convert2DTo1D(int(&matrix)[5][9]) {
         }
     }
     return *result;
+}
+
+int heuristic(vector<Shape>& shapes) {
+    int joseC;
+    int joseR;
+    int potionC;
+    int potionR;
+    for (int i = 0; i < shapes.size(); ++i) { 
+        if(shapes[i].getID() == 1) {
+            joseC = shapes[i].getEndC();
+            joseR = shapes[i].getEndR();
+        }
+        if(shapes[i].getID() == 2) {
+            potionC = shapes[i].getEndC();
+            potionR = shapes[i].getEndR();
+        }
+    }
+    int h = abs(joseR + potionR) + abs(joseC - potionC);
+
+    return h;
 }

@@ -81,12 +81,10 @@ bool Shape::collisionNorth(int(&matrix)[5][9]) {
             return false;
         }
     }
-    else {
-        return true;
-    }   
+    return true; 
 }
 bool Shape::collisionEast(int(&matrix)[5][9]) {
-    if(matrix[end.R][(end.C)+1] != 0 || (end.C+1) > 9) {
+    if(matrix[end.R][(end.C)+1] != 0 || (end.C + 1) > 8) {
         return false;
     }
     else if(matrix[(end.R)-1][(end.C)-1] == written) {
@@ -94,9 +92,7 @@ bool Shape::collisionEast(int(&matrix)[5][9]) {
             return false;
         }
     }
-    else {
-        return true;
-    }
+    return true;
 }
 bool Shape::collisionSouth(int(&matrix)[5][9]) {
     if(matrix[(end.R)+1][end.C] != 0 || (end.R+1) > 5) {
@@ -117,23 +113,19 @@ bool Shape::collisionSouth(int(&matrix)[5][9]) {
             return false;
         }
     }
-    else {
-        return true;
-    }
+    return true;
 }
 
 bool Shape::collisionWest(int(&matrix)[5][9]) {
-    if (matrix[root.R][(root.C) - 1] != 0 || (root.C - 1) < 0) {
+    if (matrix[root.R][root.C - 1] != 0 || (root.C - 1) < 0) {
         return false;
     }
-    else if (matrix[(root.R) + 1][(root.C) + 1] == written) {
-        if (matrix[(root.R) + 1][root.C] != 0) {
+    else if (matrix[root.R + 1][root.C + 1] == written) {
+        if (matrix[root.R + 1][root.C] != 0) {
             return false;
         }
     }
-    else {
-        return true;
-    }
+    return true;
 }
 
 //Move Functions
@@ -147,6 +139,15 @@ void Shape::moveWest(int(&matrix)[5][9]) {
             matrix[i][root.C - 1] = written;
         }
         //Update the root and end column positions
+        root.C -= 1;
+        end.C -= 1;
+    }
+    else if (id == 6) {
+        matrix[root.R][root.C + 1] = 0;
+        matrix[end.R][end.C] = 0;
+        matrix[root.R][root.C - 1] = written;
+        matrix[end.R][end.C - 2] = written;
+
         root.C -= 1;
         end.C -= 1;
     }
@@ -165,6 +166,17 @@ void Shape::moveNorth(int(&matrix)[5][9]) {
         root.R -= 1;
         end.R -= 1;
     }
+    else if (id == 6) {
+        matrix[root.R][root.C] = 0;
+        matrix[end.R][end.C - 1] = 0;
+        matrix[end.R][end.C] = 0;
+        matrix[root.R - 1][root.C] = written;
+        matrix[root.R - 1][root.C + 1] = written;
+        matrix[end.R - 1][end.C] = written;
+
+        root.R -= 1;
+        end.R -= 1;
+    }
 }
 
 void Shape::moveEast(int(&matrix)[5][9]) {
@@ -177,6 +189,15 @@ void Shape::moveEast(int(&matrix)[5][9]) {
             matrix[i][end.C + 1] = written;
         }
         //Update the root and end column positions
+        root.C += 1;
+        end.C += 1;
+    }
+    else if (id == 6) {
+        matrix[root.R][root.C] = 0;
+        matrix[end.R][end.C - 1] = 0;
+        matrix[root.R][root.C + 2] = written;
+        matrix[end.R][end.C + 1] = written;
+
         root.C += 1;
         end.C += 1;
     }
@@ -194,6 +215,17 @@ void Shape::moveSouth(int(&matrix)[5][9]) {
         //Update the root and end row positions
         root.R += 1;
         end.R += 1;
+    }
+    else if (id == 6) {
+        matrix[root.R][root.C] = 0;
+        matrix[root.R][root.C + 1] = 0;
+        matrix[end.R][end.C] = 0;
+        matrix[root.R + 1][root.C] = written;
+        matrix[end.R + 1][end.C] = written;
+        matrix[end.R + 1][end.C - 1] = written;
+
+        root.R -= 1;
+        end.R -= 1;
     }
 }
 

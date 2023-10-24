@@ -65,4 +65,12 @@ public:
 	string getSpriteType() {
 		return spriteType;
 	}
+
+	int getEndR() {
+		return end.R;
+	}
+
+	int getEndC() {
+		return end.C;
+	}
 };
