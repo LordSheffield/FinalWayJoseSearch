@@ -15,6 +15,10 @@ void randomDomain(int(&randomMatrix)[5][9], vector<Shape>& randomShapes);
 void displayMatrix(int(&matrix)[5][9]);
 bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5][9], vector<Shape>& setShapes, int(&setMatrix)[5][9], bool interactive = true);
 
+//FunctionsThatMightNotWork
+int convert2DTo1D(int(&matrix)[5][9]);
+int heuristic(vector<Shape>& shapes);
+
 int main() {
 
     srand(time(0)); //Seeds srand
@@ -310,11 +314,16 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
 
             continue;
         }
+        /*
         else if(command == "convert") {
             int flattenedMatrix = convert2DTo1D(setMatrix);
-            for (int i = 0; i < flattenedMatrix.length(); i++) {
+            for (int i = 0; i < flattenedMatrix.size(); i++) {
                 cout << flattenedMatrix[i] << ", ";
             }
+        }
+        */
+        else if(command == "h") {
+            cout << heuristic(setShapes) << endl;
         }
     }
 }
@@ -329,4 +338,24 @@ int convert2DTo1D(int(&matrix)[5][9]) {
         }
     }
     return *result;
+}
+
+int heuristic(vector<Shape>& shapes) {
+    int joseC;
+    int joseR;
+    int potionC;
+    int potionR;
+    for (int i = 0; i < shapes.size(); ++i) { 
+        if(shapes[i].getID() == 1) {
+            joseC = shapes[i].getEndC();
+            joseR = shapes[i].getEndR();
+        }
+        if(shapes[i].getID() == 2) {
+            potionC = shapes[i].getEndC();
+            potionR = shapes[i].getEndR();
+        }
+    }
+    int h = abs(joseR + potionR) + abs(joseC - potionC);
+
+    return h;
 }
