@@ -5,15 +5,23 @@
 #include <fstream>
 #include "vector"
 #include "Shape.h"
+#include <thread>
+#include <iomanip> 
 #include "Tokenizer.h"
+#include <Windows.h>
+#include <mmsystem.h>
+#pragma comment(lib, "Winmm.lib")
 
 using namespace std;
 
 //Functions of the main file
-void setDomain(int(&setMatrix)[5][9], vector<Shape>& shapes);
+void setDomain(int(&setMatrix)[5][9], vector<Shape>& setShapes);
+void testDomain(int(&testMatrix)[5][9], vector<Shape>& testShapes);
 void randomDomain(int(&randomMatrix)[5][9], vector<Shape>& randomShapes);
-void displayMatrix(int(&matrix)[5][9]);
-bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5][9], vector<Shape>& setShapes, int(&setMatrix)[5][9], bool interactive = true);
+void displayMatrix(int(matrix)[5][9]);
+bool win(vector<Shape> shapes);
+void movetoWin(const string& direction, Shape* selectedShape, vector<Shape>& shapes, int(&matrix)[5][9]);
+bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5][9], vector<Shape>& setShapes, int(&setMatrix)[5][9], vector<Shape>& testShapes, int(&testMatrix)[5][9], bool interactive = true);
 
 //FunctionsThatMightNotWork
 int convert2DTo1D(int(&matrix)[5][9]);
@@ -25,11 +33,14 @@ int main() {
 
     vector<Shape> randomShapes; //Vector to hold shapes of the random generator
     vector<Shape> setShapes; //Vector to hold of the set domain
+    vector<Shape> testShapes;
+
 
     int randomMatrix[5][9] = { 0 }; //Matrix to hold the infromation of the random generator
     int setMatrix[5][9] = { 0 }; //Matrix to hold the information of the set domain
+    int testMatrix[5][9] = { 0 };
 
-    if (!processText(cin, randomShapes, randomMatrix, setShapes, setMatrix, true)) {
+    if (!processText(cin, randomShapes, randomMatrix, setShapes, setMatrix, testShapes, testMatrix, true)) {
         //It cleans up all structures used. 
         randomShapes.clear();
         setShapes.clear();
@@ -46,10 +57,10 @@ int main() {
 
 
 //Print out the matrix
-void displayMatrix(int(&matrix)[5][9]) {
+void displayMatrix(int(matrix)[5][9]) {
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 9; j++) {
-            cout << matrix[i][j] << " \t";
+            cout << setw(3) << matrix[i][j];
         }
         cout << endl;
     }
@@ -121,48 +132,60 @@ void randomDomain(int(&randomMatrix)[5][9], vector<Shape>& randomShapes) {
     }
 }
 
+void testDomain(int(&testMatrix)[5][9], vector<Shape>& testShapes) {
+    testShapes.push_back(Shape(1, 4, 0, 0)); //Jose is 1
+    testShapes.push_back(Shape(2, 0, 7, 0)); //Potion is 2
+    testShapes.push_back(Shape(5, 3, 4, 0)); //Potion is 2
+    testShapes.push_back(Shape(6, 3, 2, true)); //Potion is 2
+    testShapes[0].insert(testMatrix);
+    testShapes[1].insert(testMatrix);
+    testShapes[2].insert(testMatrix);
+    testShapes[3].insertWeird(testMatrix);
+
+}
+
 //Hardcoded lvl37 of the game.
-void setDomain(int(&setMatrix)[5][9], vector<Shape>& shapes) {
+void setDomain(int(&setMatrix)[5][9], vector<Shape>& setShapes) {
 
-    //Add shapes to the vector without giving them names, they are recognized by their inherent id represented in the memory address, reference them by their index in the matrix and their actual member id
-    shapes.push_back(Shape(1, 4, 0, 0)); //Jose is 1
-    shapes.push_back(Shape(2, 0, 7, 0)); //Potion is 2
+    //Add setShapes to the vector without giving them names, they are recognized by their inherent id represented in the memory address, reference them by their index in the matrix and their actual member id
+    setShapes.push_back(Shape(1, 4, 0, 0)); //Jose is 1
+    setShapes.push_back(Shape(2, 0, 7, 0)); //Potion is 2
 
-    shapes.push_back(Shape(3, 0, 4)); //Barrier is 3
-    shapes.push_back(Shape(3, 0, 5)); //
-    shapes.push_back(Shape(3, 2, 4)); //
-    shapes.push_back(Shape(3, 4, 3)); //
-    shapes.push_back(Shape(3, 4, 4)); //
+    setShapes.push_back(Shape(3, 0, 4)); //Barrier is 3
+    setShapes.push_back(Shape(3, 0, 5)); //
+    setShapes.push_back(Shape(3, 2, 4)); //
+    setShapes.push_back(Shape(3, 4, 3)); //
+    setShapes.push_back(Shape(3, 4, 4)); //
 
-    shapes.push_back(Shape(4, 2, 2, 0)); //Lamp is 4
-    shapes.push_back(Shape(4, 2, 5, 0)); //
-    shapes.push_back(Shape(5, 1, 5, 0)); //Camel is 5
-    shapes.push_back(Shape(5, 3, 0, 0)); //
-    shapes.push_back(Shape(6, 0, 0, true)); //Weird is 6
-    shapes.push_back(Shape(6, 3, 6, true)); //
+    setShapes.push_back(Shape(4, 2, 2, 0)); //Lamp is 4
+    setShapes.push_back(Shape(4, 2, 5, 0)); //
+    setShapes.push_back(Shape(5, 1, 5, 0)); //Camel is 5
+    setShapes.push_back(Shape(5, 3, 0, 0)); //
+    setShapes.push_back(Shape(6, 0, 0, true)); //Weird is 6
+    setShapes.push_back(Shape(6, 3, 6, true)); //
 
 
     //Uses switch to insert things properly into the matrix by calling the correct insert functions based on ids
-    for (int i = 0; i < shapes.size(); ++i) {
-        int id = shapes[i].getID();
+    for (int i = 0; i < setShapes.size(); ++i) {
+        int id = setShapes[i].getID();
         switch (id) {
         case 1:
-            shapes[i].insert(setMatrix);
+            setShapes[i].insert(setMatrix);
             break;
         case 2:
-            shapes[i].insert(setMatrix);
+            setShapes[i].insert(setMatrix);
             break;
         case 3:
-            shapes[i].insertBarrier(setMatrix);
+            setShapes[i].insertBarrier(setMatrix);
             break;
         case 4:
-            shapes[i].insert(setMatrix);
+            setShapes[i].insert(setMatrix);
             break;
         case 5:
-            shapes[i].insert(setMatrix);
+            setShapes[i].insert(setMatrix);
             break;
         case 6:
-            shapes[i].insertWeird(setMatrix);
+            setShapes[i].insertWeird(setMatrix);
             break;
         default:
             //There's no case where it will fail here
@@ -172,7 +195,7 @@ void setDomain(int(&setMatrix)[5][9], vector<Shape>& shapes) {
 }
 
 //Credits to Mr. Aubrey Knight. I stole the structure of the Tokenizer class from my old projects in my Data Structures class.
-bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5][9], vector<Shape>& setShapes, int(&setMatrix)[5][9], bool interactive) {
+bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5][9], vector<Shape>& setShapes, int(&setMatrix)[5][9], vector<Shape>& testShapes, int(&testMatrix)[5][9], bool interactive) {
     string line;
     string command;
     string arg1, arg2, arg3;
@@ -202,18 +225,76 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
         tkn.setString(line);
 
         tkn.readWord(command);
-        if (command == "exit") {
+        if (command == "exit") { //Exist console.
             cout << "Exiting ...." << endl;
             return false;
         }
-        if (command == "clear") {
+        if (command == "clear") { //Clear console window.
             system("cls");
         }
-        if (command == "set") {
+        if (command == "set") { //Sets the domain for the setDomain faster
             setDomain(setMatrix, setShapes);
             displayMatrix(setMatrix);
+            cout << endl;
+        }
+        if (command == "test") {  //Thoubleshooting domain, can have individual pieces inserted and tested freely.
+            testDomain(testMatrix, testShapes);
+            displayMatrix(testMatrix);
+            cout << endl;
         }
 
+        if (command == "solve") {
+            ifstream file("solve.txt");
+            if (file.is_open()) {
+                string fileCommand;
+                while (getline(file, fileCommand)) {
+                    //Execute each command in the file
+                    istringstream iss(fileCommand);
+                    processText(iss, randomShapes, randomMatrix, setShapes, setMatrix, testShapes, testMatrix, false);
+
+                    // Sleep for 1 second
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
+                file.close();
+            }
+            else {
+                cout << "Unable to open file" << endl;
+            }
+            continue;
+        }
+
+
+        //testMatrix stuff
+        if (command == "t") {
+            tkn.readInteger(int1);
+            tkn.readWord(arg2);
+
+            if (int1 == 3) {
+                cout << "Error, you attempted to move a barrier." << endl;
+                continue;
+            }
+
+            for (int i = 0; i < testShapes.size(); i++) {
+                if (testShapes[i].getWritten() == int1) {
+                    selectedShape = &testShapes[i];
+                }
+            }
+
+            if (arg2 == "s" || arg2 == "S") {
+                movetoWin(arg2, selectedShape, testShapes, testMatrix);
+            }
+            else if (arg2 == "n" || arg2 == "N") {
+                movetoWin(arg2, selectedShape, testShapes, testMatrix);
+            }
+            else if (arg2 == "e" || arg2 == "E") {
+                movetoWin(arg2, selectedShape, testShapes, testMatrix);
+            }
+            else if (arg2 == "w" || arg2 == "W") {
+                movetoWin(arg2, selectedShape, testShapes, testMatrix);
+            }
+        }
+
+        //setMatrix stuff
         if (command == "s") {
             tkn.readWord(arg1);
             if (arg1 == "random") {
@@ -242,10 +323,25 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
                     cout << "Unexpected input." << endl;
                 }
             }
+            else if (arg1 == "test") {
+                setDomain(testMatrix, testShapes);
+                tkn.readWord(arg2);
+                if (arg2 == "-d") {
+                    displayMatrix(testMatrix);
+                }
+                else if (arg2 == "") {
+                    continue;
+                }
+                else {
+                    cout << "Unexpected input." << endl;
+                }
+            }
             else {
                 cout << "Unexpected input." << endl;
             }
         }
+        
+        //Direct display handlers
         else if (command == "-d") {
             tkn.readWord(arg1);
             if (arg1 == "s") {
@@ -254,11 +350,16 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
             else if (arg1 == "r") {
                 displayMatrix(randomMatrix);
             }
+            else if (arg1 == "t") {
+                displayMatrix(testMatrix);
+            }
             else {
                 cout << "Unexpected input." << endl;
             }
         }
-        else if (command == "move") { //move 23 N
+        
+        //Moving function calls
+        else if (command == "m") { //move 23 N
             tkn.readInteger(int1);
             tkn.readWord(arg2);
 
@@ -273,52 +374,19 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
                 }
             }
 
-            if (arg2 == "s" || arg2 == "S"){
-                if (selectedShape->collisionSouth(setMatrix)) {
-                    cout << "You can move South." << endl;
-                    selectedShape->moveSouth(setMatrix);
-                    displayMatrix(setMatrix);
-                }
-                else {
-                    cout << "You cannot move South." << endl;
-                }
+            if (arg2 == "s" || arg2 == "S" || arg2 == "n" || arg2 == "N" || arg2 == "e" || arg2 == "E" || arg2 == "w" || arg2 == "W") {
+                movetoWin(arg2, selectedShape, setShapes, setMatrix);
             }
-            else if (arg2 == "n" || arg2 == "N") {
-                if (selectedShape->collisionNorth(setMatrix)) {
-                    cout << "You can move North." << endl;
-                    selectedShape->moveNorth(setMatrix);
-                    displayMatrix(setMatrix);
-                }
-                else {
-                    cout << "You cannot move North." << endl;
-                }
-            }
-            else if (arg2 == "e" || arg2 == "E") {
-                if (selectedShape->collisionEast(setMatrix)) {
-                    cout << "You can move East." << endl;
-                    selectedShape->moveEast(setMatrix);
-                    displayMatrix(setMatrix);
-                }
-                else {
-                    cout << "You cannot move East." << endl;
-                }
-            }
-            else if (arg2 == "w" || arg2 == "W") {
-                if (selectedShape->collisionWest(setMatrix)) {
-                    cout << "You can move West." << endl;
-                    selectedShape->moveWest(setMatrix);
-                    displayMatrix(setMatrix);
-                }
-                else {
-                    cout << "You cannot move West." << endl;
-                }
-            }
+
             else {
                 cout << "Unexpected input." << endl;
             }
 
             continue;
         }
+        
+
+        //TO BE REMOVED
         /*
         else if(command == "convert") {
             int flattenedMatrix = convert2DTo1D(setMatrix);
@@ -327,11 +395,106 @@ bool processText(istream& is, vector<Shape>& randomShapes, int(&randomMatrix)[5]
             }
         }
         */
+
+        //Heuristics calculator.
         else if(command == "h") {
             cout << heuristic(setShapes) << endl;
         }
     }
 }
+
+//Checks for win condition.
+bool win(vector<Shape> shapes) {
+    //Check if Jose's indexes are the same as the potion's indexes
+    if (shapes[0].getRoot().R == shapes[1].getRoot().R && shapes[0].getRoot().C == shapes[1].getRoot().C) {
+        return true; //WIN
+    }
+    return false;  //Not yet
+}
+
+
+//This function is used to move pieces without oversaturating the processText function, since it's where we do the most handling
+void movetoWin(const string& direction, Shape* selectedShape, vector<Shape>& shapes, int(&matrix)[5][9]) {
+
+    //For every cardinal direction, we simply check collion, and the move the piece. 
+    //Those are functions already set up in the Shape class, and we also call the display and win functions from the main file.
+    if (direction == "s" || direction == "S") {
+        if (selectedShape->collisionSouth(shapes[1], matrix)) { //Calls collision
+            cout << "You can move South." << endl; //Success message.
+            selectedShape->moveSouth(matrix); //Calls move function.
+        }
+        else if (selectedShape->getID() == 2) { //Potion cannot be moved. 
+            cout << "You cannot move the potion." << endl;
+        }
+        else {
+            cout << "You cannot move South." << endl; //Error message in case of false.
+        }
+    }
+    else if (direction == "n" || direction == "N") {
+        if (selectedShape->collisionNorth(shapes[1], matrix)) { //In each call of collision, shapes[1], the potion index is passed, because there is an exception of movement, for when jose moves into the potion, which should be true.
+            cout << "You can move North." << endl;
+            selectedShape->moveNorth(matrix);
+        }
+        else if (selectedShape->getID() == 2) { //Potion cannot be moved. 
+            cout << "You cannot move the potion." << endl;
+        }
+        else {
+            cout << "You cannot move " << selectedShape->getWritten() << " North." << endl;
+        }
+    }
+    else if (direction == "e" || direction == "E") {
+        if (selectedShape->collisionEast(shapes[1], matrix)) {
+            cout << "You can move East." << endl;
+            selectedShape->moveEast(matrix);
+        }
+        else if (selectedShape->getID() == 2) { //Potion cannot be moved. 
+            cout << "You cannot move the potion." << endl;
+        }
+        else {
+            cout << "You cannot move " << selectedShape->getWritten() << " East." << endl;
+        }
+    }
+    else if (direction == "w" || direction == "W") {
+        if (selectedShape->collisionWest(shapes[1], matrix)) {
+            cout << "You can move West." << endl;
+            selectedShape->moveWest(matrix);
+        }
+        else if (selectedShape->getID() == 2) { //Potion cannot be moved. 
+            cout << "You cannot move the potion." << endl;
+        }
+        else {
+            cout << "You cannot move " << selectedShape->getWritten() << " West." << endl;
+        }
+    }
+    else {
+        cout << "Unexpected input." << endl;
+        return;
+    }
+
+    displayMatrix(matrix); //Just displays the matrix every interaction that is allowed.
+    cout << endl;
+
+    if (win(shapes)) { //Checks for win condition, by calling the win function, and then prints Jose's image.
+        cout << endl << "Jose found his way! Game over." << endl << endl;
+        ifstream file("joseFoundaWay.txt");
+        if (file.is_open()) {
+            string line;
+            while (getline(file, line)) {
+                cout << line << endl;
+            }
+            file.close();
+        }
+        else {
+            cout << "Unable to open file" << endl;
+        }
+
+        // Play the win song
+        PlaySound(TEXT("winsong.mp3"), NULL, SND_FILENAME | SND_ASYNC);
+
+        exit(0); // End the game
+    }
+}
+
 
 int convert2DTo1D(int(&matrix)[5][9]) {
     int result[45];
@@ -364,3 +527,4 @@ int heuristic(vector<Shape>& shapes) {
 
     return h;
 }
+

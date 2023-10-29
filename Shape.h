@@ -11,7 +11,7 @@ struct Point {
 
 class Shape
 {
-private: 
+private:
 	Point root;
 	Point end;
 
@@ -35,11 +35,12 @@ public:
 	//Constructor for creating weirds
 	Shape(int id, int rR, int rC, bool dummy2);
 
-	bool collisionNorth(int(&matrix)[5][9]);
-	bool collisionEast(int(&matrix)[5][9]);
-	bool collisionSouth(int(&matrix)[5][9]);
-	bool collisionWest(int(&matrix)[5][9]);
+	bool collisionNorth(const Shape& potion, const int(&matrix)[5][9]);
+	bool collisionEast(const Shape& potion, const int(&matrix)[5][9]);
+	bool collisionSouth(const Shape& potion, const int(&matrix)[5][9]);
+	bool collisionWest(const Shape& potion, const int(&matrix)[5][9]);
 
+	//Testing function.
 	void displayPoints() {
 		cout << "Root(R,C): (" << root.R << "," << root.C << ")" << endl;
 		cout << "End(R,C): (" << end.R << "," << end.C << ")" << endl;
@@ -54,23 +55,27 @@ public:
 	bool insertWeird(int(&matrix)[5][9]);
 	bool insertBarrier(int(&matrix)[5][9]);
 
-	int getID() {
+	int getID() { //Retruns ID.
 		return id;
 	}
-
-	int getWritten() {
+	int getWritten() { //Returns written.
 		return written;
 	}
-
-	string getSpriteType() {
+	string getSpriteType() { //Returns spriteType for graphics branch.
 		return spriteType;
 	}
-
-	int getEndR() {
+	int getEndR() { //Returns end point row.
 		return end.R;
 	}
-
-	int getEndC() {
+	int getEndC() { //Returns end point column.
 		return end.C;
+	}
+
+	//Returns Point root and end.
+	Point getRoot() const {
+		return root;
+	}
+	Point getEnd() const {
+		return end;
 	}
 };

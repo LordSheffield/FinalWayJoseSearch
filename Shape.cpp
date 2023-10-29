@@ -1,7 +1,7 @@
 #include "Shape.h"
 #include <vector>
 
-int Shape::instanceCounter = 20; 
+int Shape::instanceCounter = 20;
 
 //Just creates a null constructor
 Shape::Shape() {
@@ -33,7 +33,6 @@ Shape::Shape(int id, int rR, int cR, int dummy1) {
     root.C = cR;
     end.R = rR;
     end.C = cR;
-    
 
     this->id = id;
 
@@ -70,53 +69,141 @@ Shape::Shape(int id, int rR, int rC, bool dummy2) {
     written = ++instanceCounter;
 }
 
-
 //Collisions Functions
-bool Shape::collisionNorth(int(&matrix)[5][9]) {
-    if(matrix[(root.R)-1][root.C] != 0 || (root.R-1) < 0) {
-        return false;
-    }
-    else if(matrix[root.R][(root.C)+1] == written) {
-        if(matrix[(root.R)-1][(root.C)+1] != 0) {
-            return false;
+bool Shape::collisionNorth(const Shape& potion, const int(&matrix)[5][9]) {
+    //If calling shape's ID is 1, and its current position -1 row is the same as the potion, return true. Jose must be able to go inside the potion.
+    if (id == 1) {
+        if ((root.R - 1 == 0 && end.R - 1 == potion.root.R) || (root.R - 1 == potion.end.R && end.R - 1 == 0) || (root.R - 1 == potion.root.R && end.R - 1 == potion.root.R)) {
+            return true;
         }
     }
-    return true; 
+
+
+    if (id == 2 || id == 3) { //Potion or barrier cannot be moved.
+        return false;
+    }
+
+    if (id != 6) {
+        //Check all the indexes to the right of the root until it reaches the end point.
+        //Check if the cells directly above the shape are clear for movement.
+        for (int i = 0; i < end.C - root.C + 1; i++) {
+            //Check if we're at the top row or if there's a cell above that's not empty
+            if (root.R - 1 < 0 || matrix[root.R - 1][root.C + i] != 0) {
+                return false;
+            }
+        }
+
+    }
+    else { //Handle id == 6, weird shape
+
+        //Check the first row from root.R, root.c to end.R-1 to root.C+1 can be moved up, and checks for out of bounds.
+        for (int i = 0; i < end.C - root.C + 1; i++) {
+            if (matrix[root.R][(root.C) + i] == written) {
+                if ((root.R - 1) < 0 || matrix[(root.R) - 1][(root.C) + i] != 0) {
+                    return false;
+                }
+            }
+        }
+
+        for (int i = 0; i < end.C - (root.C + 1) + 1; i++) {
+            if (matrix[root.R - 1][(root.C + 1) + i] == written) {
+                //If any of the cells in the second row are out of bounds or occupied, return false.
+                if ((root.R - 2) < 0 || matrix[(root.R - 2)][(root.C + 1) + i] != 0) {
+                    return false;
+                }
+            }
+            //Check if end.R-1 and end.C is not occupied.
+            if ((end.R - 1) < 0 || matrix[end.R - 1][end.C] != 0) {
+                return false;
+            }
+        }
+
+    }
+
+    return true;
 }
-bool Shape::collisionEast(int(&matrix)[5][9]) {
-    if(matrix[end.R][(end.C)+1] != 0 || (end.C + 1) > 8) {
+
+bool Shape::collisionSouth(const Shape& potion, const int(&matrix)[5][9]) {
+    //If calling shape's ID is 1, and its current idex n +1 row is the same as the potion, return true. Jose must be able to go inside the potion.
+    if (id == 1) {
+        if ((root.R + 1 == 0 && end.R + 1 == potion.root.R) || (root.R + 1 == potion.end.R && end.R + 1 == 0) || (root.R + 1 == potion.root.R && end.R + 1 == potion.root.R)) {
+            return true;
+        }
+    }
+
+    if (id == 2 || id == 3) { //Potion or barrier cannot be moved.
         return false;
     }
-    else if(matrix[(end.R)-1][(end.C)-1] == written) {
-        if(matrix[(end.R)-1][end.C] != 0) {
+
+    if (id != 6) {
+        //Check all the indexes to the right of the root until it reaches the end point.
+        for (int i = 0; i < end.C - root.C + 1; i++) {
+            if (matrix[end.R][(root.C) + i] == written) {
+                //If any of the cells to the right are out of bounds or occupied, return false.
+                if ((end.R + 1) >= 5 || matrix[(end.R) + 1][(root.C) + i] != 0) {
+                    return false;
+                }
+            }
+        }
+    }
+    else { //Handle id == 6, weird shape
+        //Check the first row from root.R to end.R+1 to root.C to end.C can be moved down, and check for out of bounds.
+        for (int i = 0; i < end.C - (root.C + 1) + 1; i++) {
+            if (matrix[root.R + 1][(root.C + 1) + i] == written) {
+                //If any of the cells in the second row are out of bounds or occupied, return false.
+                if ((root.R + 2) > 5 || matrix[(root.R + 2)][(root.C + 1) + i] != 0) {
+                    return false;
+                }
+            }
+            //Check if end.R-1 and end.C is not occupied.
+            if ((end.R + 1) >= 5 || matrix[end.R + 1][end.C] != 0) {
+                return false;
+            }
+        }
+
+        //Checks if root.R+1 root.C is !=0, if so, fail. And check for out of bounds. No need to check root.C+1 because it will always be part of the shape. 
+        if ((root.R + 1) >= 5 || matrix[(root.R) + 1][root.C] != 0) {
             return false;
         }
+
     }
     return true;
 }
-bool Shape::collisionSouth(int(&matrix)[5][9]) {
-    if(matrix[(end.R)+1][end.C] != 0 || (end.R+1) > 5) {
+
+bool Shape::collisionEast(const Shape& potion, const int(&matrix)[5][9]) {
+
+    //If calling shape's ID is 1, and it's current position +1 column is the same as the potion, then return true. Jose must be able to go inside the potion.
+    if (id == 1 && (end.C + 1 >= potion.root.C && end.C + 1 <= potion.end.C)) {
+        return true;
+    }
+
+    if (id == 2 || id == 3) { //Potion or barrier cannot be moved.
         return false;
     }
-    else if((matrix[end.R][(end.C)-1] == written) && (matrix[end.R][(end.C)-2] == written) && (matrix[end.R][(end.C)-3] == written)) {
-        if((matrix[(end.R)+1][(end.C)-1] != 0) || (matrix[(end.R)+1][(end.C)-2] != 0) || (matrix[(end.R)+1][(end.C)-3] != 0)) {
-            return false;
-        }
+
+    //If the index east of the calling shape's end is used or is out of bounds, return false.
+    if (matrix[end.R][(end.C) + 1] != 0 || (end.C + 1) > 8) {
+        return false;
     }
-    else if((matrix[end.R][(end.C)-1] == written) && (matrix[end.R][(end.C)-2] != written)) {
-        if(matrix[(end.R)+1][(end.C)-1] != 0) {
-            return false;
-        }
-    }
-    else if((matrix[end.R][(end.C)-1] == written) && (matrix[end.R][(end.C)-2] != written) && (matrix[(end.R)-1][(end.C)-2] == written)) {
-        if((matrix[(end.R)+1][(end.C)-1] != 0) && (matrix[end.R][(end.C)-2] != 0)) {
+
+    //This will 
+    else if (matrix[(end.R) - 1][(end.C) - 1] == written) {
+        if (matrix[(end.R) - 1][end.C] != 0) {
             return false;
         }
     }
     return true;
 }
 
-bool Shape::collisionWest(int(&matrix)[5][9]) {
+bool Shape::collisionWest(const Shape& potion, const int(&matrix)[5][9]) {
+    if (id == 1 && (root.C - 1 >= potion.root.C && root.C - 1 <= potion.end.C)) {
+        return true;
+    }
+
+    if (id == 2 || id == 3) { //Potion or barrier cannot be moved.
+        return false;
+    }
+
     if (matrix[root.R][root.C - 1] != 0 || (root.C - 1) < 0) {
         return false;
     }
@@ -217,15 +304,19 @@ void Shape::moveSouth(int(&matrix)[5][9]) {
         end.R += 1;
     }
     else if (id == 6) {
+        //Clear the previous position of the shape
         matrix[root.R][root.C] = 0;
         matrix[root.R][root.C + 1] = 0;
         matrix[end.R][end.C] = 0;
+
+        //Move the shape one position downward
         matrix[root.R + 1][root.C] = written;
         matrix[end.R + 1][end.C] = written;
         matrix[end.R + 1][end.C - 1] = written;
 
-        root.R -= 1;
-        end.R -= 1;
+        //Update the root and end row positions
+        root.R += 1;
+        end.R += 1;
     }
 }
 
@@ -234,7 +325,7 @@ void Shape::moveSouth(int(&matrix)[5][9]) {
 
 /*
 ///////////////////////////////////////////////////////////////////////// IMPORTANT //////////////////////////////////////////////////////////////////////////////////////////
-Insert functions will all perform a index check if index is !=0. That ensures that a shape won't overwrite another one already in the matrix. Function fails is so. 
+Insert functions will all perform a index check if index is !=0. That ensures that a shape won't overwrite another one already in the matrix. Function fails is so.
 Insert functions will all perform a bound test, checking the root of each shape is beyond the far edges of the matrix. Really important for the randomDomain only.
 Insert functions will all have member "written" be "id * 10 + instanceCounter", this ensures that shapes with the same "id" are written with different numbers in the matrix.
     Otherwise, it would be hard to distinguish where one thing ends and the other start for the collison checks.
@@ -248,7 +339,7 @@ bool Shape::insert(int(&matrix)[5][9]) {
 
     //Write the shape into the matrix
     for (int j = this->root.C; j <= this->end.C; j++) {
-        if (matrix[this->root.R][j] != 0) { 
+        if (matrix[this->root.R][j] != 0) {
             return false;
         }
         matrix[this->root.R][j] = written;
