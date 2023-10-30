@@ -73,4 +73,12 @@ public:
 	int getEndC() {
 		return end.C;
 	}
+
+	//Returns Point root and end.
+	Point getRoot() const {
+		return root;
+	}
+	Point getEnd() const {
+		return end;
+	}
 };
